@@ -2,11 +2,11 @@
 module regfile(input         clk, 
                input         we3, 
                input  [4:0]  ra1, 
-					input  [4:0]  ra2, 
-					input  [4:0]  wa3, 
+					     input  [4:0]  ra2, 
+					     input  [4:0]  wa3, 
                input  [31:0] wd3, 
                output [31:0] rd1, 
-					output [31:0] rd2);
+					     output [31:0] rd2);
 
   reg [31:0] rf[31:0];
 
@@ -48,9 +48,10 @@ module signext20(input  [19:0] a,
   assign y = {{12{a[19]}}, a};
 endmodule
 
+// D触发器
 module flopr #(parameter WIDTH = 8)
               (input clk, 
-				   input reset,
+				       input reset,
                input      [WIDTH-1:0] d, 
                output reg [WIDTH-1:0] q);
 
@@ -59,9 +60,10 @@ module flopr #(parameter WIDTH = 8)
     else       q <= d;
 endmodule
 
+// 2选1选择器
 module mux2 #(parameter WIDTH = 8)
              (input  [WIDTH-1:0] d0, 
-				  input  [WIDTH-1:0] d1, 
+				      input  [WIDTH-1:0] d1, 
               input              s, 
               output [WIDTH-1:0] y);
 

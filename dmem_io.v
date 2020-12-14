@@ -1,12 +1,15 @@
-module dmem_io(input         clk, 
+// 数据寄存器
+module dmem_io(
+      input       clk, 
 			input			  we,
-            input  [31:0] a, 
+      input  [31:0] a, 
 			input  [31:0] wd,
-            output [31:0] rd,
+      output [31:0] rd,
 			input [3:0] porta_in, 
 			input [15:0] portb_in,			   
 			output [15:0] portc_out,
-			output [15:0] portd_out);
+			output [15:0] portd_out
+    );
 
   reg  [31:0] RAM[15:0];
   reg  [31:0] rdata;
@@ -30,8 +33,38 @@ module dmem_io(input         clk,
   assign rdata_RAM = RAM[a[5:2]];
 
   // add bcd2bin module here, from input sw to output portb
+  binary2BCD u_binary2BCD_b (
+    .binary(sw),
+    .thousands(portb[15:12]),
+    .hundreds(portb[11:8]),
+    .tens(portb[7:4]),
+    .ones(portb[3:0])
+  );
   
   // add bin2bcd and led7seg module here, from input portc_reg to output seg/an
+  reg [3:0] thousands;
+  reg [3:0] hundreds;
+  reg [3:0] tens;
+  reg [3:0] ones;
+  binary2BCD u_binary2BCD_c (
+    .binary(portc_reg),
+    .thousands(thousands),
+    .hundreds(hundreds),
+    .tens(tens),
+    .ones(ones)
+  );
+
+  reg [0:6] seg;
+  reg [0:3] an;
+  display_7seg_x4 u_display_7seg_x4 (
+    .clk(clk),
+    .in0(thousands),
+    .in1(hundreds),
+    .in2(tens),
+    .in3(ones),
+    .seg(seg),
+    .an(an)
+  )
   
   // dmem read
   always @(a, porta, portb, portc_reg, portd_reg, rdata_RAM)

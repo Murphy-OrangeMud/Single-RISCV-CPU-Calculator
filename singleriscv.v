@@ -1,11 +1,12 @@
 
 // single-cycle RISC-V processor
-module singleriscv(input        clk, reset,
+module singleriscv(
+            input         clk, reset,
             output [31:0] pc,
             input  [31:0] instr,
             output        memwrite,
             output [31:0] aluout,
-			output [31:0] writedata,
+			   output [31:0] writedata,
             input  [31:0] readdata);
 
   wire        memtoreg, branch,
@@ -61,7 +62,7 @@ module maindec(input  [6:0] op,
 
   always @( * )
     case(op)
-	   7'b0110111: controls <= 9'b1100000_00; //LUI
+	   7'b0110111: controls <= 9'b1100000_00; //LUI U型指令“高位立即数”指令
       7'b0110011: controls <= 9'b1000000_10; //R-TYP
       7'b0000011: controls <= 9'b1010010_00; //LW
       7'b0100011: controls <= 9'b0010100_00; //SW
@@ -118,12 +119,14 @@ module datapath(input         clk,
   // next PC logic
   assign pcsrc = branch & zero;
 
-  flopr #(32) pcreg(clk, reset, pcnext, pc);
-  adder       pcadd1(pc, 32'b100, pcplus4);
+  flopr #(32) pcreg(clk, reset, pcnext, pc); // 更新PC
+  adder       pcadd1(pc, 32'b100, pcplus4);  // 顺序执行
+  // branch和jump立即数的左移和相加
   sl1         branchsh(branchimmext, branchimmextsh);
   sl1			  jumpsh(jumpimmext, jumpimmextsh);
   adder       pcadd2(pc, branchimmextsh, pcbranch);
   adder		  pcadd3(pc, jumpimmextsh, pcjump);
+  //branch和jump的选择
   mux2 #(32)  pcbrmux(pcplus4, pcbranch, pcsrc,
                       pcnextbr);
   mux2 #(32)  pcmux(pcnextbr, pcjump, jump,
@@ -141,9 +144,11 @@ module datapath(input         clk,
 							resultlui, aluout_lui);					
   mux2 #(32)  resmux(aluout_lui, readdata,
                      memtoreg, result);
-							
+
+  // I型指令（对齐立即数）
   signext12    se12_imm(instr[31:20], immext);
-  signext12		sel2_sw({instr[31:25], instr[11:7]}, swimmext);
+  // store
+  signext12		se12_sw({instr[31:25], instr[11:7]}, swimmext);
   signext20		se21_jump({instr[31], instr[19:12], instr[20], instr[30:21]}, jumpimmext);
   signext12    se12_br({instr[31], instr[7], instr[30:25], instr[11:8]}, branchimmext);
 
@@ -152,6 +157,7 @@ module datapath(input         clk,
   mux2 #(32)  srcbmux(writedata, srcbimmext, alusrc,
                       srcb);
 							 
+  // shamt: shift amount
   assign shamt = instr[24:20];
   alu32 #(32) alu(srca, srcb, alucontrol, shamt,
                   aluout, zero);

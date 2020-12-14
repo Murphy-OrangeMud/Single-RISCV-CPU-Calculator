@@ -1,3 +1,4 @@
+// 指令寄存器
 module imem (input [7:0] a,
 				output [31:0] rd);
 
