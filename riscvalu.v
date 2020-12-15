@@ -179,11 +179,15 @@ module complement32 #(parameter WIDTH = 32)
     always @(*) begin
         for (i = 0; i < 32; i = i + 1) begin
             if (in[i] == 1) begin
-                if (flag) out[i] <= 0;
-                else flag <= 1;
+                if (flag) out[i] = 0;
+                else begin
+                    flag = 1;
+                    out[i] = 1;
+                end
             end
             else begin
-                if (flag) out[i] <= 1;
+                if (flag) out[i] = 1;
+                else out[i] = 0;
             end
         end
     end
