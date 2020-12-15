@@ -32,6 +32,7 @@ module dmem_io(
   
   assign rdata_RAM = RAM[a[5:2]];
 
+  /*
   // add bcd2bin module here, from input sw to output portb
   binary2BCD u_binary2BCD_b (
     .binary(sw),
@@ -64,7 +65,7 @@ module dmem_io(
     .in3(ones),
     .seg(seg),
     .an(an)
-  )
+  );*/
   
   // dmem read
   always @(a, porta, portb, portc_reg, portd_reg, rdata_RAM)
