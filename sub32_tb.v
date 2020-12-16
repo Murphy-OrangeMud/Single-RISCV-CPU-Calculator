@@ -1,6 +1,6 @@
 module sub32_tb();
-    reg [31:0] srca = 32'h00000eff;
-    reg [31:0] srcb = 32'h00000234;
+    reg [31:0] srca = 32'hcc;
+    reg [31:0] srcb = 32'h65;
 
     wire [31:0] aluout;
     wire [4:0] shamt;

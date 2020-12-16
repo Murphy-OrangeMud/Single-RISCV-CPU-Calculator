@@ -4,11 +4,18 @@ module alu32 #(parameter WIDTH = 32)
              input [3:0] alucontrol,
              input [4:0] shamt, 
              output reg [31:0] aluout,
-             output zero);
+             output reg zero);
     
     parameter add = 4'b0000;
     parameter sub = 4'b1000;
     parameter slt = 4'b0010;
+    parameter sll = 4'b0001;
+    parameter sltu = 4'b0011;
+    parameter xor_ = 4'b0100;
+    parameter srl = 4'b0101;
+    parameter sra = 4'b1101;
+    parameter or_ = 4'b0110;
+    parameter and_ = 4'b0111;
 
     wire [31:0] aluout_add;
     wire [31:0] aluout_sub;
@@ -17,11 +24,15 @@ module alu32 #(parameter WIDTH = 32)
     sub32 u_sub32(srca, srcb, aluout_sub);
     
     always @(*) begin
-        if (alucontrol == add) aluout <= aluout_add;
-        else if (alucontrol == sub) aluout <= aluout_sub;
-        else if (alucontrol == slt) begin
-            aluout <= { 31'b0, aluout_sub[31] };
-        end
+        case (alucontrol)
+        add: aluout <= aluout_add;
+        sub: aluout <= aluout_sub;
+        slt: aluout <= { 31'b0, aluout_sub[31] };
+        or_: aluout <= srca | srcb;
+        and_: aluout <= srca & srcb;
+        xor_: aluout <= srca ^ srcb;
+        endcase
+        zero <= (srca == srcb);
     end
     
 endmodule
@@ -170,6 +181,7 @@ module add32 #(parameter WIDTH = 32)
 
 endmodule
 
+/*
 module complement32 #(parameter WIDTH = 32)
                    (input [31:0] in,
                     output reg [31:0] out);
@@ -193,6 +205,7 @@ module complement32 #(parameter WIDTH = 32)
     end
 
 endmodule
+*/
 
 module sub32 #(parameter WIDTH = 32)
             (input [31:0] srca,
@@ -201,7 +214,8 @@ module sub32 #(parameter WIDTH = 32)
     
     wire [31:0] compl_srcb;
 
-    complement32 u_complement32(srcb, compl_srcb);
-    add32 u_add32(srca, compl_srcb, aluout);
+    // complement32 u_complement32(srcb, compl_srcb);
+    add32 u_add32_1(~srcb, 32'b1, compl_srcb);
+    add32 u_add32_2(srca, compl_srcb, aluout);
 
 endmodule
