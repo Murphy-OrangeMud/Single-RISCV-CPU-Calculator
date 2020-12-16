@@ -66,7 +66,7 @@ module maindec(input  [6:0] op,
       7'b0110011: controls <= 9'b1000000_10; //R-TYP
       7'b0000011: controls <= 9'b1010010_00; //LW
       7'b0100011: controls <= 9'b0010100_00; //SW
-      7'b1100011: controls <= 9'b0001000_01; //BEQ
+      7'b1100011: controls <= 9'b0001000_11; //B-TYPE
       7'b0010011: controls <= 9'b1010000_11; //I-TYPE
       7'b1101111: controls <= 9'b0000001_00; //JAL
       default:   controls <= 9'bxxxxxx_xxx; //???
@@ -126,7 +126,7 @@ module datapath(input         clk,
   sl1			  jumpsh(jumpimmext, jumpimmextsh);
   adder       pcadd2(pc, branchimmextsh, pcbranch);
   adder		  pcadd3(pc, jumpimmextsh, pcjump);
-  //branch和jump的选择
+  // branch和jump的选择
   mux2 #(32)  pcbrmux(pcplus4, pcbranch, pcsrc,
                       pcnextbr);
   mux2 #(32)  pcmux(pcnextbr, pcjump, jump,

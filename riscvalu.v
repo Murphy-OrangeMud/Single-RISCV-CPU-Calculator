@@ -32,7 +32,9 @@ module alu32 #(parameter WIDTH = 32)
         and_: aluout <= srca & srcb;
         xor_: aluout <= srca ^ srcb;
         endcase
-        zero <= (srca == srcb);
+        zero = (aluout_sub == 32'b0);
+        if (alucontrol == 4'b0001)
+            zero = ~zero;
     end
     
 endmodule
