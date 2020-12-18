@@ -14,7 +14,7 @@ module binary2BCD(
     shifter[15:0] = binary;
     shifter[31:16] = 0; 
     
-    for (i = 0; i< 14; i = i+1) begin 
+    for (i = 0; i < 16; i = i+1) begin 
         if (shifter[19:16] >= 5) 
             shifter[19:16] = shifter[19:16] + 3; 
         if (shifter[23:20] >= 5)             

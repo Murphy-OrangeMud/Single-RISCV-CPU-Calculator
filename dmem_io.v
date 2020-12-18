@@ -30,7 +30,7 @@ module dmem_io(
   assign porta = porta_in;
   assign portb = portb_in;
   
-  assign rdata_RAM = RAM[a[5:2]];
+  assign rdata_RAM = RAM[a[3:0]];
 
   // add bcd2bin module here, from input sw to output portb
 
@@ -40,9 +40,9 @@ module dmem_io(
   always @(a, porta, portb, portc_reg, portd_reg, rdata_RAM)
     begin
 	   if ( a == 32'h00007f00 )
-		  begin rdata = {{28{1'b0}}, porta}; end
+		  begin rdata = {{28{1'b0}}, porta}; /*$display("read data port a: %d", rdata);*/ end
 		else if ( a == 32'h00007f10 )
-        begin rdata = {{24{1'b0}}, portb}; end
+      begin rdata = {{16{1'b0}}, portb}; /*$display("read data port b: %d", rdata);*/ end
 		else if ( a == 32'h00007f20 )
 		  begin rdata = {{16{1'b0}}, portc_reg}; end
 		else if ( a == 32'h00007ffc )

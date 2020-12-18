@@ -16,7 +16,7 @@ module BCD2Binary(
     shifter[23:20] = tens;
     shifter[19:16] = ones;
     shifter[15:0] = 0;
-    for (i = 0; i < 14; i = i + 1)
+    for (i = 0; i < 16; i = i + 1)
     begin
       shifter = shifter >> 1;
       if (shifter[31:28] >= 8)

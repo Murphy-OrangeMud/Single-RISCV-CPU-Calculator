@@ -70,7 +70,7 @@ module singleriscv_tb();
   initial
     begin
       {btnL, btnC, btnR, btnU} = 0;	    
-      sw <= 16'h0f;
+      sw <= 16'b1;
       cnt <= 32'b0;
       btnD <= 1; # 40; btnD <= 0;
     end
@@ -91,26 +91,25 @@ module singleriscv_tb();
   always
     begin
       # 100000;
-      sw <= 16'h5;
+      sw <= 16'h05;
       # 100000;
-      {btnL, btnC, btnR, btnU} <= 4'b1000;
+      {btnL, btnC, btnR, btnU} <= 4'b0010;
       # 100000;
-      sw <= 16'h8;
+      {btnL, btnC, btnR, btnU} <= 4'b0000;
+      # 100000;
+      sw <= 16'h0a;
       # 100000;
       {btnL, btnC, btnR, btnU} <= 4'b0001;
+      # 1000;
+      {btnL, btnC, btnR, btnU} <= 4'b0000;
     end
 
   always @(negedge clk)
     begin
       if (memwrite) begin
-        //if (dmem_address == 32'h00007f20) begin
-          $display("write port: %h, data: %d", dmem_address, writedata);
-          if (writedata == 13) $stop;
-        //end
+        $display("write port: %h, data: %d", dmem_address, writedata);
+        if (writedata == 50) $stop;
       end
-      //if (memtoreg) begin
-        //$display("read port: %h, data: %d", dmem_address, readdata);
-      //end
     end
   
   /*
