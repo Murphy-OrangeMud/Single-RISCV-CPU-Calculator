@@ -17,7 +17,15 @@ module singleriscv_tb();
   wire [15:0] portd_out;
   
   assign bnt = {btnL, btnC, btnR, btnU}; // add, sub, multiply, =
-  assign portb_in = sw;		// You need connect this portb_in to output of BCD2Bin module which input is sw;
+  //assign portb_in = sw;		// You need connect this portb_in to output of BCD2Bin module which input is sw;
+
+  BCD2Binary u_BCD2Binary(
+    .thousands(sw[15:12]),
+    .hundreds(sw[11:8]),
+    .tens(sw[7:4]),
+    .ones(sw[3:0]),
+    .binary(portb_in)
+  );
   
   // instantiate devices to be tested
   singleriscv u_singleriscv(mclk, reset_global, pc, instr,
@@ -29,15 +37,41 @@ module singleriscv_tb();
             writedata, readdata, btn, portb_in, portc_out, portd_out);
 
   assign led = portd_out;
-  assign seg = 0;		// You need connect this IO to output of LED Driver which input is portc_out
-  assign an = 4'b1111;		// You need connect this IO to output of LED Driver which input is portc_out
+  //assign seg = 0;		// You need connect this IO to output of LED Driver which input is portc_out
+  //assign an = 4'b1111;		// You need connect this IO to output of LED Driver which input is portc_out
   assign btn = {btnL, btnC, btnR, btnU};
+
+  wire [3:0] thousands;
+  wire [3:0] hundreds;
+  wire [3:0] tens;
+  wire [3:0] ones;
+
+  binary2BCD u_binary2BCD(
+    .binary(portc_out),
+    .thousands(thousands),
+    .hundreds(hundreds),
+    .tens(tens),
+    .ones(ones)
+  );
+
+  display_7seg_x4 u_display_7seg_x4(
+    .CLK(clk),
+    .in0(portc_out[3:0]),
+    .in1(portc_out[7:4]),
+    .in2(portc_out[11:8]),
+    .in3(portc_out[15:12]),
+    .seg(seg),
+    .an(an)
+  );
   
+  reg [31:0] cnt;
+
   // initialize input
   initial
     begin
       {btnL, btnC, btnR, btnU} = 0;	    
-      sw <= 8'h0f;
+      sw <= 16'h0f;
+      cnt <= 32'b0;
       btnD <= 1; # 40; btnD <= 0;
     end
 
@@ -48,11 +82,38 @@ module singleriscv_tb();
     begin
       # 20;
       clk <= 1; # 20; 
+      cnt <= cnt + 1;
       clk <= 0;
     end
 
   assign mclk = clk;
 
+  always
+    begin
+      # 100000;
+      sw <= 16'h5;
+      # 100000;
+      {btnL, btnC, btnR, btnU} <= 4'b1000;
+      # 100000;
+      sw <= 16'h8;
+      # 100000;
+      {btnL, btnC, btnR, btnU} <= 4'b0001;
+    end
+
+  always @(negedge clk)
+    begin
+      if (memwrite) begin
+        //if (dmem_address == 32'h00007f20) begin
+          $display("write port: %h, data: %d", dmem_address, writedata);
+          if (writedata == 13) $stop;
+        //end
+      end
+      //if (memtoreg) begin
+        //$display("read port: %h, data: %d", dmem_address, readdata);
+      //end
+    end
+  
+  /*
   // check results
   always@(negedge clk)
     begin
@@ -65,4 +126,5 @@ module singleriscv_tb();
         //$stop;
       end
     end
+  */
 endmodule

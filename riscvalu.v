@@ -9,11 +9,11 @@ module alu32 #(parameter WIDTH = 32)
     parameter add = 4'b0000;
     parameter sub = 4'b1000;
     parameter slt = 4'b0010;
-    parameter sll = 4'b0001;
+    parameter slli = 4'b0001;
     parameter sltu = 4'b0011;
     parameter xor_ = 4'b0100;
-    parameter srl = 4'b0101;
-    parameter sra = 4'b1101;
+    parameter srli = 4'b0101;
+    parameter srai = 4'b1101;
     parameter or_ = 4'b0110;
     parameter and_ = 4'b0111;
 
@@ -22,6 +22,7 @@ module alu32 #(parameter WIDTH = 32)
 
     add32 u_add32(srca, srcb, aluout_add);
     sub32 u_sub32(srca, srcb, aluout_sub);
+    integer i;
     
     always @(*) begin
         case (alucontrol)
@@ -31,6 +32,27 @@ module alu32 #(parameter WIDTH = 32)
         or_: aluout <= srca | srcb;
         and_: aluout <= srca & srcb;
         xor_: aluout <= srca ^ srcb;
+        slli: 
+        begin
+            aluout = srca;
+            for (i = 0; i < shamt; i = i + 1) begin
+                aluout = {aluout[30:0], 1'b0};
+            end
+        end
+        srli:
+        begin
+            aluout = srca;
+            for (i = 0; i < shamt; i = i + 1) begin
+                aluout = {1'b0, aluout[31:1]};
+            end
+        end
+        srai:
+        begin
+            aluout = srca;
+            for (i = 0; i < shamt; i = i + 1) begin
+                aluout = {aluout[31], aluout[31:1]};
+            end 
+        end
         endcase
         zero = (aluout_sub == 32'b0);
         if (alucontrol == 4'b0001)

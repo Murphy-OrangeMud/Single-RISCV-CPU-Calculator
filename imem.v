@@ -6,7 +6,7 @@ module imem (input [7:0] a,
 
 	initial
 	begin
-		$readmemh ("riscvtest.dat",RAM);
+		$readmemh ("calculatortest.dat",RAM);
 	end
 
 	assign rd = RAM[a]; // word aligned

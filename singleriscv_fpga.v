@@ -2,8 +2,8 @@ module singleriscv_fpga(input clk,
 			  input btnC, btnU, btnL, btnD, btnR, 
 			  input [15:0] sw,
 			  output [15:0] led,
-			  output [6:0] seg,
-			  output [3:0] an
+			  output [0:6] seg,
+			  output [0:3] an
            );
 
   wire [3:0] btn;
@@ -15,8 +15,16 @@ module singleriscv_fpga(input clk,
   wire [15:0] portc_out;
   wire [15:0] portd_out;
   
-  assign bnt = {btnL, btnC, btnR, btnU}; // add, sub, multiply, =
-  assign portb_in = sw;		// You need connect this portb_in to output of BCD2Bin module which input is sw;
+  assign btn = {btnL, btnC, btnR, btnU}; // add, sub, multiply, =
+  //assign portb_in = 16'b0;		// You need connect this portb_in to output of BCD2Bin module which input is sw;
+
+  BCD2Binary u_BCD2Binary(
+    .thousands(sw[15:12]),
+    .hundreds(sw[11:8]),
+    .tens(sw[7:4]),
+    .ones(sw[3:0]),
+    .binary(portb_in)
+  );
   
   //generate 10hz clock
   reg [23:0] cnt;
@@ -61,7 +69,30 @@ module singleriscv_fpga(input clk,
             writedata, readdata, btn, portb_in, portc_out, portd_out);
 
   assign led = portd_out;
-  assign seg = 0;				// You need connect this IO to output of LED Driver which input is portc_out
-  assign an = 4'b1111;		// You need connect this IO to output of LED Driver which input is portc_out
+  //assign seg = 0;				// You need connect this IO to output of LED Driver which input is portc_out
+  //assign an = 4'b1111;		// You need connect this IO to output of LED Driver which input is portc_out
+
+  wire [3:0] thousands;
+  wire [3:0] hundreds;
+  wire [3:0] tens;
+  wire [3:0] ones;
+
+  binary2BCD u_binary2BCD(
+    .binary(portc_out),
+    .thousands(thousands),
+    .hundreds(hundreds),
+    .tens(tens),
+    .ones(ones)
+  );
+
+  display_7seg_x4 u_display_7seg_x4(
+    .CLK(clk),
+    .in0(ones),
+    .in1(tens),
+    .in2(hundreds),
+    .in3(thousands),
+    .seg(seg),
+    .an(an)
+  );
 
 endmodule

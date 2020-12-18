@@ -11,7 +11,7 @@ main:   addi x2, x0, 5  # x2 = 5
 	addi x5, x0, 0
 around: slt x4, x7, x2  # x4 = 1
 	add x7, x4, x5  # x7 = 12
-	sub x7, x7, x2  # x7 = 7 problem here
+	sub x7, x7, x2  # x7 = 7
 	lui x3, 1  # x3 = 0x1000
 	sw x7, 12(x3)  # 0x100c <- 7
 	addi x3, x3, 8  # x3 = 0x1008

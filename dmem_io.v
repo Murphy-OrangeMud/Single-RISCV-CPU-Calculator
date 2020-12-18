@@ -32,51 +32,20 @@ module dmem_io(
   
   assign rdata_RAM = RAM[a[5:2]];
 
-  /*
   // add bcd2bin module here, from input sw to output portb
-  binary2BCD u_binary2BCD_b (
-    .binary(sw),
-    .thousands(portb[15:12]),
-    .hundreds(portb[11:8]),
-    .tens(portb[7:4]),
-    .ones(portb[3:0])
-  );
-  
-  // add bin2bcd and led7seg module here, from input portc_reg to output seg/an
-  reg [3:0] thousands;
-  reg [3:0] hundreds;
-  reg [3:0] tens;
-  reg [3:0] ones;
-  binary2BCD u_binary2BCD_c (
-    .binary(portc_reg),
-    .thousands(thousands),
-    .hundreds(hundreds),
-    .tens(tens),
-    .ones(ones)
-  );
 
-  reg [0:6] seg;
-  reg [0:3] an;
-  display_7seg_x4 u_display_7seg_x4 (
-    .clk(clk),
-    .in0(thousands),
-    .in1(hundreds),
-    .in2(tens),
-    .in3(ones),
-    .seg(seg),
-    .an(an)
-  );*/
-  
+  // add bin2bcd and led7seg module here, from input portc_reg to output seg/an
+
   // dmem read
   always @(a, porta, portb, portc_reg, portd_reg, rdata_RAM)
     begin
-	   if ( a == 32'h0000ff00 )
+	   if ( a == 32'h00007f00 )
 		  begin rdata = {{28{1'b0}}, porta}; end
-		else if ( a == 32'h0000ff10 )
+		else if ( a == 32'h00007f10 )
         begin rdata = {{24{1'b0}}, portb}; end
-		else if ( a == 32'h0000ff20 )
+		else if ( a == 32'h00007f20 )
 		  begin rdata = {{16{1'b0}}, portc_reg}; end
-		else if ( a == 32'h0000fffc )
+		else if ( a == 32'h00007ffc )
 		  begin rdata = {{16{1'b0}}, portd_reg}; end
 		else
 		  rdata = rdata_RAM; // word aligned
