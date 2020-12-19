@@ -45,6 +45,7 @@ loopa:
 waitfornext:
     add x6, x8, x0
     add x5, x7, x0
+    sw x5, 0x20(x16)
     j begin
 plus:
     add x5, x5, x7

@@ -63,8 +63,6 @@ module singleriscv_tb();
     .seg(seg),
     .an(an)
   );
-  
-  reg [31:0] cnt;
 
   // initialize input
   initial

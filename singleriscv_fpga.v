@@ -16,7 +16,7 @@ module singleriscv_fpga(input clk,
   wire [15:0] portd_out;
   
   assign btn = {btnL, btnC, btnR, btnU}; // add, sub, multiply, =
-  //assign portb_in = 16'b0;		// You need connect this portb_in to output of BCD2Bin module which input is sw;
+  //assign portb_in = sw;		// You need connect this portb_in to output of BCD2Bin module which input is sw;
 
   BCD2Binary u_BCD2Binary(
     .thousands(sw[15:12]),
@@ -57,7 +57,8 @@ module singleriscv_fpga(input clk,
 		rst_sync <= btnU_reg;
     end
 
-  assign reset_global = rst_sync | btnU;	 
+  //assign reset_global = rst_sync | btnU;
+  assign reset_global = btnD;
   
   // instantiate devices to be tested
   singleriscv u_singleriscv(mclk, reset_global, pc, instr,
